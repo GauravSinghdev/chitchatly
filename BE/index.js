@@ -18,7 +18,7 @@ app.use(express.json());
 
 app.use(
   cors({
-    origin: ["http://localhost:5173", "https://www.chitchatly.codewithkara.com"],
+    origin: ["http://localhost:5173", "https://chitchatly.codewithkara.com"],
     credentials: true,
   })
 );
