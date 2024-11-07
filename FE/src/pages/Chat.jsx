@@ -37,7 +37,7 @@ const Chat = () => {
   }, []);
 
   const connectWs = () => {
-    const ws = new WebSocket("ws://cchat-server.codewithkara.com");
+    const ws = new WebSocket("wss://cchat-server.codewithkara.com");
     setWs(ws);
     ws.addEventListener("message", handleMessage);
     ws.addEventListener("close", () => {
