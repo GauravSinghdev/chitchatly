@@ -150,24 +150,35 @@ const Chat = () => {
   const messageWithoutDupes = uniqBy(messages, "_id");    
 
   const handleLogout = async () => {
-    try{
-      const tokenDel = await axios.post(`${getBaseUrl()}/logout`, {
-        withCredentials: true,
+    try {
+      // Send a logout request to the backend
+      const response = await axios.post(`${getBaseUrl()}/logout`, {}, {
+        withCredentials: true, // Make sure credentials (cookies) are sent with the request
       });
-      if(tokenDel)
-      {
+  
+      // Check the response from the server
+      if (response.status === 200) {
+        // Clear any relevant state upon successful logout
         setWs(null);
         setCurrentId(null);
         setCurrentUsername(null);
+  
+        // Show success toast
         toast.success("Logged off successfully!");
+  
+        // Redirect to login page
         Navigate('/login');
+      } else {
+        // Handle unexpected responses
+        toast.error('Log out failed. Try again.');
       }
-      
-    } catch(err){
-      toast.error('Log out failed. Try again.')
+    } catch (err) {
+      // Handle any errors during the request
+      console.error("Logout error:", err);
+      toast.error('Log out failed. Try again.');
     }
-    
   };
+  
 
   if (redirect) {
     return <Navigate to="/login" />;
