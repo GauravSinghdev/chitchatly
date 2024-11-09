@@ -155,9 +155,6 @@ const Chat = () => {
       const response = await axios.post(`${getBaseUrl()}/logout`, {}, {
         withCredentials: true, // Make sure credentials (cookies) are sent with the request
       });
-  
-      // Check the response from the server
-      if (response.status === 200) {
         // Clear any relevant state upon successful logout
         setWs(null);
         setCurrentId(null);
@@ -168,11 +165,7 @@ const Chat = () => {
   
         // Redirect to login page
         Navigate('/login');
-      } else {
-        // Handle unexpected responses
-        toast.error('Log out failed. Try again.');
-      }
-    } catch (err) {
+      } catch (err) {
       // Handle any errors during the request
       console.error("Logout error:", err);
       toast.error('Log out failed. Try again.');
