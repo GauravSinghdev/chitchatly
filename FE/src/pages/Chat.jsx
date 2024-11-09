@@ -150,7 +150,6 @@ const Chat = () => {
   const messageWithoutDupes = uniqBy(messages, "_id");    
 
   const handleLogout = async () => {
-    try {
       // Send a logout request to the backend
       await axios.post(`${getBaseUrl()}/logout`, {}, {
         withCredentials: true, // Make sure credentials (cookies) are sent with the request
@@ -162,11 +161,6 @@ const Chat = () => {
   
         // Show success toast
         toast.success("Logged off successfully!");
-      } catch (err) {
-      // Handle any errors during the request
-      console.error("Logout error:", err);
-      toast.error('Log out failed. Try again.');
-    }
   };
   
 
