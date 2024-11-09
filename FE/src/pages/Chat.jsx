@@ -152,7 +152,7 @@ const Chat = () => {
   const handleLogout = async () => {
     try {
       // Send a logout request to the backend
-      const response = await axios.post(`${getBaseUrl()}/logout`, {}, {
+      await axios.post(`${getBaseUrl()}/logout`, {}, {
         withCredentials: true, // Make sure credentials (cookies) are sent with the request
       });
         // Clear any relevant state upon successful logout
