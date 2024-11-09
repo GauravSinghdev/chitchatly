@@ -162,9 +162,6 @@ const Chat = () => {
   
         // Show success toast
         toast.success("Logged off successfully!");
-  
-        // Redirect to login page
-        Navigate('/login');
       } catch (err) {
       // Handle any errors during the request
       console.error("Logout error:", err);
