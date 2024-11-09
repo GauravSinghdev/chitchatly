@@ -177,6 +177,10 @@ app.post("/register", async (req, res) => {
   }
 });
 
+app.post('/logout', (req,res) => {
+  res.cookie('token', '', {sameSite:'none', secure:true}).json('ok');
+});
+
 const server = app.listen(3000);
 
 const wss = new ws.WebSocketServer({ server });

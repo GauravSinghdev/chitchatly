@@ -11,12 +11,14 @@ import getBaseUrl from "../utils/baseUrl";
 import { CgLogOff } from "react-icons/cg";
 import { toast } from "react-toastify";
 
+
 const Chat = () => {
   const [ws, setWs] = useState(null);
   const [onlinePeople, setOnlinePeople] = useState({});
   const [allUsers, setAllUsers] = useState([]); // State to store all users
   const [selectedUserId, setSelectedUserId] = useState(null);
-  const { currentUsername, currentId, setCurrentUser } = useContext(UserContext);
+  const { currentUsername, currentId, setCurrentUsername, setCurrentId } =
+    useContext(UserContext);
   const [newMsgTexted, setNewMsgTexted] = useState("");
   const [messages, setMessages] = useState([]);
   const [redirect, setRedirect] = useState(false);
@@ -105,7 +107,9 @@ const Chat = () => {
         const response = await axios.get(`${getBaseUrl()}/people`, {
           withCredentials: true,
         });
-        setAllUsers(response.data.filter((user) => user.username !== currentUsername));
+        setAllUsers(
+          response.data.filter((user) => user.username !== currentUsername)
+        );
       } catch (err) {
         setErrorMessage("Failed to load users. Please try again.");
         console.error(err);
@@ -125,9 +129,10 @@ const Chat = () => {
           );
           const messagesWithValidDate = response.data.map((message) => ({
             ...message,
-            createdAt: message.createdAt && !isNaN(new Date(message.createdAt))
-              ? new Date(message.createdAt).toISOString()
-              : new Date().toISOString(),
+            createdAt:
+              message.createdAt && !isNaN(new Date(message.createdAt))
+                ? new Date(message.createdAt).toISOString()
+                : new Date().toISOString(),
           }));
           setMessages(messagesWithValidDate);
         } catch (err) {
@@ -144,8 +149,24 @@ const Chat = () => {
 
   const messageWithoutDupes = uniqBy(messages, "_id");
 
-  const handleLogout = () => {
-    toast.success("Logged Off Successfully!");
+  const handleLogout = async () => {
+    try{
+      const tokenDel = await axios.post(`${getBaseUrl()}/logout`, {
+        withCredentials: true,
+      });
+      if(tokenDel)
+      {
+        setWs(null);
+        setCurrentId(null);
+        setCurrentUsername(null);
+        toast.success("Logged off successfully!");
+        Navigate('/login');
+      }
+      
+    } catch(err){
+      toast.error('Log out failed. Try again.')
+    }
+    
   };
 
   if (redirect) {
@@ -186,9 +207,7 @@ const Chat = () => {
               </div>
             ))
           ) : (
-            <div className="text-gray-600 text-center p-4">
-              No users found.
-            </div>
+            <div className="text-gray-600 text-center p-4">No users found.</div>
           )}
         </div>
         <div className="p-4 border-t flex justify-between items-center">
@@ -235,10 +254,13 @@ const Chat = () => {
                         <div className="text-xs text-black/80 text-right">
                           {message.createdAt &&
                           !isNaN(new Date(message.createdAt))
-                            ? new Date(message.createdAt).toLocaleTimeString([], {
-                                hour: "2-digit",
-                                minute: "2-digit",
-                              })
+                            ? new Date(message.createdAt).toLocaleTimeString(
+                                [],
+                                {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                }
+                              )
                             : "Invalid time"}
                         </div>
                       </div>
