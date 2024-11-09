@@ -147,7 +147,7 @@ const Chat = () => {
   const onlinePeopleExcludeUs = { ...onlinePeople };
   delete onlinePeopleExcludeUs[currentId];
 
-  const messageWithoutDupes = uniqBy(messages, "_id");
+  const messageWithoutDupes = uniqBy(messages, "_id");    
 
   const handleLogout = async () => {
     try{
