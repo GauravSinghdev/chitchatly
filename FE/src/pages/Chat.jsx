@@ -11,14 +11,12 @@ import getBaseUrl from "../utils/baseUrl";
 import { CgLogOff } from "react-icons/cg";
 import { toast } from "react-toastify";
 
-
 const Chat = () => {
   const [ws, setWs] = useState(null);
   const [onlinePeople, setOnlinePeople] = useState({});
-  const [allUsers, setAllUsers] = useState([]); // State to store all users
+  const [allUsers, setAllUsers] = useState([]);
   const [selectedUserId, setSelectedUserId] = useState(null);
-  const { currentUsername, currentId, setCurrentUsername, setCurrentId } =
-    useContext(UserContext);
+  const { currentUsername, currentId, setCurrentUsername, setCurrentId } = useContext(UserContext);
   const [newMsgTexted, setNewMsgTexted] = useState("");
   const [messages, setMessages] = useState([]);
   const [redirect, setRedirect] = useState(false);
@@ -33,7 +31,7 @@ const Chat = () => {
     }
   }, [currentUsername]);
 
-  // Set up WebSocket connection
+  // WebSocket connection
   useEffect(() => {
     connectWs();
   }, []);
@@ -50,7 +48,6 @@ const Chat = () => {
     });
   };
 
-  // Update online users' list
   const showOnlinePeople = (peopleArray) => {
     const people = {};
     peopleArray.forEach(({ userId, username }) => {
@@ -59,7 +56,6 @@ const Chat = () => {
     setOnlinePeople(people);
   };
 
-  // Handle messages from WebSocket
   const handleMessage = (e) => {
     const messageData = JSON.parse(e.data);
     if ("online" in messageData) {
@@ -72,7 +68,6 @@ const Chat = () => {
     }
   };
 
-  // Send a new message via WebSocket
   const sendMsg = (e) => {
     e.preventDefault();
     if (!newMsgTexted.trim()) return;
@@ -94,13 +89,8 @@ const Chat = () => {
     );
 
     setNewMsgTexted("");
-    const div = divUnderMsg.current;
-    if (div) {
-      div.scrollIntoView({ behavior: "smooth", block: "end" });
-    }
   };
 
-  // Fetch all users from the database
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -118,7 +108,6 @@ const Chat = () => {
     fetchUsers();
   }, [currentUsername]);
 
-  // Fetch messages for the selected user
   useEffect(() => {
     if (selectedUserId) {
       const fetchMessages = async () => {
@@ -144,25 +133,26 @@ const Chat = () => {
     }
   }, [selectedUserId]);
 
+  // Scroll to the bottom whenever the messages array changes
+  useEffect(() => {
+    const div = divUnderMsg.current;
+    if (div) {
+      div.scrollIntoView({ behavior: "smooth", block: "end" });
+    }
+  }, [messages]);
+
   const onlinePeopleExcludeUs = { ...onlinePeople };
   delete onlinePeopleExcludeUs[currentId];
 
-  const messageWithoutDupes = uniqBy(messages, "_id");    
+  const messageWithoutDupes = uniqBy(messages, "_id");
 
   const handleLogout = async () => {
-      // Send a logout request to the backend
-      await axios.post(`${getBaseUrl()}/logout`, {}, {
-        withCredentials: true, // Make sure credentials (cookies) are sent with the request
-      });
-        // Clear any relevant state upon successful logout
-        setWs(null);
-        setCurrentId(null);
-        setCurrentUsername(null);
-  
-        // Show success toast
-        toast.success("Logged off successfully!");
+    await axios.post(`${getBaseUrl()}/logout`, {}, { withCredentials: true });
+    setWs(null);
+    setCurrentId(null);
+    setCurrentUsername(null);
+    toast.success("Logged off successfully!");
   };
-  
 
   if (redirect) {
     return <Navigate to="/login" />;
@@ -188,17 +178,18 @@ const Chat = () => {
                 onClick={() => setSelectedUserId(user._id)}
                 className={`border-b border-gray-300 p-3 flex items-center gap-3 cursor-pointer transition duration-200 ease-in-out ${
                   user._id === selectedUserId
-                    ? "bg-blue-200 border-l-4 border-green-600" // Active selection color
+                    ? "bg-blue-200 border-l-4"
                     : onlinePeople[user._id]
-                    ? "bg-green-100" // Green background for online users
-                    : "hover:bg-gray-100" // Default hover for offline users
+                    ? "bg-green-100"
+                    : "hover:bg-gray-100"
                 }`}
               >
-                <Avatar username={user.username} userId={user._id} />
+                <Avatar
+                  username={user.username}
+                  userId={user._id}
+                  isOnline={onlinePeople[user._id]}
+                />
                 <span className="text-gray-800">{user.username}</span>
-                {onlinePeople[user._id] && (
-                  <span className="ml-2 text-green-500">Online</span>
-                )}
               </div>
             ))
           ) : (
